@@ -78,6 +78,7 @@
 
       // Summary
       const cart = Store.loadCart();
+      const locationLabel = Store.getCartLocationLabel ? Store.getCartLocationLabel() : "";
       const summary = document.getElementById("summary");
       if(cart.length === 0){
         summary.innerHTML = `
@@ -96,6 +97,13 @@
           </div>
         </div>
       `).join('');
+      if(locationLabel){
+        html += `
+          <div class="summary summary--muted">
+            <span>موقع التوصيل</span>
+            <span>${locationLabel}</span>
+          </div>`;
+      }
       html += `
         <div class="summary">
           <span>الإجمالي</span>
@@ -126,6 +134,7 @@
 
         const itemsStr = buildItemsList(cart);
         const totalStr = formatNumber(totalOf(cart));
+        const fullAddress = locationLabel ? `${locationLabel} — ${address}` : address;
         const template = (window.config && config.whatsapp && config.whatsapp.template)
           ? config.whatsapp.template
           : "السلام عليكم، أريد:\n{{items}}\nالإجمالي: {{total}} MRU\nالاسم: {{name}}\nالهاتف: {{phone}}\nالعنوان: {{address}}";
@@ -133,7 +142,9 @@
         const message = tpl(template, {
           items: itemsStr,
           total: totalStr,
-          name, phone, address
+          name,
+          phone,
+          address: fullAddress
         });
 
         const num = (window.config && config.whatsapp && config.whatsapp.number)
@@ -146,21 +157,12 @@
           // clear cart
           localStorage.setItem("perfume_cart","[]");
           Store.updateCartCount();
-          // toast
-          const tdiv = document.createElement('div');
-          tdiv.id = 'toast';
-          tdiv.innerHTML = `<span>${t("toasts.checkout_success")}</span>`;
-          document.body.appendChild(tdiv);
-          setTimeout(()=>{ tdiv.classList.add("fade-out"); setTimeout(()=> tdiv.remove(), 350); }, 1800);
+          Store.renderCart && Store.renderCart();
+          Store.showToast && Store.showToast(t("toasts.checkout_success"), { type: "success" });
           // redirect home
           setTimeout(()=> location.href = "index.html", 600);
         }catch(e){
-          const tdiv = document.createElement('div');
-          tdiv.id = 'toast';
-          tdiv.style.background = '#ef4444';
-          tdiv.innerHTML = `<span>${t("toasts.checkout_failed")}</span>`;
-          document.body.appendChild(tdiv);
-          setTimeout(()=>{ tdiv.classList.add("fade-out"); setTimeout(()=> tdiv.remove(), 350); }, 1800);
+          Store.showToast && Store.showToast(t("toasts.checkout_failed"), { type: "danger" });
         }
       });
     });
