@@ -1,0 +1,13 @@
+{
+  "brand": {
+    "name": "العطر الأصلي",
+    "logo": "image/logo.png"
+  },
+  "whatsapp": {
+    "number": "22242723477",
+    "template": "السلام عليكم، أريد:\n{{items}}\nالإجمالي: {{total}} MRU\nالاسم: {{name}}\nالهاتف: {{phone}}\nالعنوان: {{address}}"
+  },
+  "ui": {
+    "theme": "light"
+  }
+}
