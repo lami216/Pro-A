@@ -62,6 +62,7 @@
         }">${product.badge}</span>` : "";
 
     const wishActive = Store.loadWishlist().includes(product.name);
+    const heartClass = wishActive ? "fas fa-solid" : "far fa-regular";
 
     const availability = product.available
       ? `<span class="availability availability--yes">${t("availability.yes")}</span>`
@@ -79,7 +80,7 @@
       <div class="product-card fade-in" data-id="${product.name}">
         ${badgeHTML}
         <button class="product-card__wish ${wishActive ? "active" : ""}" data-wishlist-id="${product.name}" aria-pressed="${wishActive}" onclick="Store.toggleWishlist('${product.name}')">
-          <i class="fas fa-heart"></i>
+          <i class="${heartClass} fa-heart"></i>
         </button>
         <img class="product-card__image" src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250?text=عطر'">
         <h3 class="product-card__title">${product.name}</h3>

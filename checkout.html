@@ -36,10 +36,16 @@
           </div>
           <div>
             <label class="muted">رقم الهاتف</label>
-            <input id="coPhone" class="input" placeholder="مثال: 22222222">
+            <input id="coPhone" class="input" placeholder="مثال: 42723477">
           </div>
           <div style="grid-column:1/-1;">
-            <label class="muted">العنوان</label>
+            <div class="field-label-with-action">
+              <label class="muted" for="coAddress">العنوان</label>
+              <button type="button" id="useLocation" class="location-chip">
+                <i class="fas fa-location-crosshairs"></i>
+                استخدم موقعي الحالي
+              </button>
+            </div>
             <input id="coAddress" class="input" placeholder="المدينة / الحي / تفاصيل التوصيل">
           </div>
         </div>
@@ -78,7 +84,6 @@
 
       // Summary
       const cart = Store.loadCart();
-      const locationLabel = Store.getCartLocationLabel ? Store.getCartLocationLabel() : "";
       const summary = document.getElementById("summary");
       if(cart.length === 0){
         summary.innerHTML = `
@@ -97,13 +102,6 @@
           </div>
         </div>
       `).join('');
-      if(locationLabel){
-        html += `
-          <div class="summary summary--muted">
-            <span>موقع التوصيل</span>
-            <span>${locationLabel}</span>
-          </div>`;
-      }
       html += `
         <div class="summary">
           <span>الإجمالي</span>
@@ -116,6 +114,45 @@
       const phoneEl = document.getElementById("coPhone");
       const addrEl  = document.getElementById("coAddress");
       const btn = document.getElementById("sendOrder");
+      const locationBtn = document.getElementById("useLocation");
+      const defaultLocationLabel = locationBtn ? locationBtn.innerHTML : "";
+      let locationLink = "";
+
+      const resetLocationBtn = ()=>{
+        if(!locationBtn) return;
+        locationBtn.disabled = false;
+        locationBtn.classList.remove("is-loading");
+        locationBtn.innerHTML = defaultLocationLabel;
+      };
+
+      locationBtn?.addEventListener("click", ()=>{
+        if(locationBtn.disabled) return;
+        if(!navigator.geolocation){
+          Store.showToast && Store.showToast("خدمة تحديد الموقع غير متاحة على هذا الجهاز", { type: "danger" });
+          return;
+        }
+        locationBtn.disabled = true;
+        locationBtn.classList.add("is-loading");
+        locationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ تحديد موقعك…';
+
+        navigator.geolocation.getCurrentPosition(position => {
+          const { latitude, longitude } = position.coords || {};
+          if(latitude == null || longitude == null){
+            Store.showToast && Store.showToast("تعذر قراءة الإحداثيات", { type: "danger" });
+            resetLocationBtn();
+            return;
+          }
+          locationLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+          if(addrEl && !(addrEl.value || "").trim()){
+            addrEl.value = locationLink;
+          }
+          Store.showToast && Store.showToast("تم حفظ موقعك الحالي", { type: "success" });
+          resetLocationBtn();
+        }, () => {
+          Store.showToast && Store.showToast("يرجى السماح بالوصول إلى موقعك للمتابعة", { type: "danger" });
+          resetLocationBtn();
+        }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+      });
 
       btn.addEventListener("click", ()=>{
         const name = (nameEl.value||"").trim();
@@ -134,7 +171,13 @@
 
         const itemsStr = buildItemsList(cart);
         const totalStr = formatCurrency(totalOf(cart));
-        const fullAddress = locationLabel ? `${locationLabel} — ${address}` : address;
+        const addressHasLink = locationLink && address.includes(locationLink);
+        const addressText = addressHasLink
+          ? address.replace(locationLink, "").replace(/[\s-]+$/, "").trim()
+          : address;
+        const addressForMessage = locationLink
+          ? `${addressText}${addressText ? '\n' : ''}موقعي: ${locationLink}`
+          : addressText;
         const template = (window.config && config.whatsapp && config.whatsapp.template)
           ? config.whatsapp.template
           : "السلام عليكم، أريد:\n{{items}}\nالإجمالي: {{total}}\nالاسم: {{name}}\nالهاتف: {{phone}}\nالعنوان: {{address}}";
@@ -144,7 +187,7 @@
           total: totalStr,
           name,
           phone,
-          address: fullAddress
+          address: addressForMessage
         });
 
         const num = (window.config && config.whatsapp && config.whatsapp.number)
@@ -164,6 +207,7 @@
         }catch(e){
           Store.showToast && Store.showToast(t("toasts.checkout_failed"), { type: "danger" });
         }
+        resetLocationBtn();
       });
     });
   </script>

@@ -44,6 +44,8 @@
     const toolbar = document.getElementById("toolbar");
     if(!toolbar) return;
 
+    const showCategoryFilter = !(ctx.isBest || ctx.isDiscounts) && (ctx.catFromQuery === "all");
+
     toolbar.innerHTML = `
       <div class="toolbar__top w-100">
         <div class="search-bar">
@@ -55,12 +57,13 @@
       </div>
 
       <div class="toolbar w-100">
+        ${showCategoryFilter ? `
         <select id="categorySel" class="select">
           <option value="all">جميع الفئات</option>
           <option value="men">رجالي</option>
           <option value="women">نسائي</option>
           <option value="unisex">مختلط</option>
-        </select>
+        </select>` : ""}
 
         <select id="priceSel" class="select">
           ${PRICE_RANGES.map(r=>`<option value="${r.key}">${r.label}</option>`).join("")}
@@ -90,12 +93,14 @@
     };
 
     // ضبط التصنيف من السياق إن وجد
-    categorySelect.value = (ctx.isBest || ctx.isDiscounts) ? "all" : (ctx.catFromQuery || "all");
+    if(categorySelect){
+      categorySelect.value = (ctx.isBest || ctx.isDiscounts) ? "all" : (ctx.catFromQuery || "all");
+    }
 
     // أحداث
     queryInput.addEventListener("input", render);
     priceSelect.addEventListener("change", render);
-    categorySelect.addEventListener("change", render);
+    categorySelect?.addEventListener("change", render);
     availabilitySelect.addEventListener("change", render);
     document.getElementById("searchBtn").addEventListener("click", render);
 
@@ -145,7 +150,7 @@
   function filterProducts(ctx){
     const q = (queryInput?.value || "").trim().toLowerCase();
     const priceKey = priceSelect?.value || "all";
-    const cat = categorySelect?.value || "all";
+    const cat = categorySelect ? (categorySelect.value || "all") : (ctx.catFromQuery || "all");
     const avail = availabilitySelect?.value || "all";
 
     const priceTest = PRICE_RANGES.find(r => r.key === priceKey)?.test || PRICE_RANGES[0].test;
@@ -181,6 +186,7 @@
       : (product.price > 0 ? `<span class="price">${formatCurrency(product.price)}</span>` : `<span class="chip">السعر عند الطلب</span>`);
 
     const wishActive = Store.loadWishlist().includes(product.name);
+    const heartClass = wishActive ? "fas fa-solid" : "far fa-regular";
 
     const availability = product.available
       ? `<span class="availability availability--yes">${t("availability.yes")}</span>`
@@ -189,7 +195,7 @@
     return `
       <div class="surface fade-in list-item" data-id="${product.name}" style="display:flex; gap:.8rem; padding:.8rem; position:relative;">
         <button class="list-item__wish ${wishActive ? "active" : ""}" data-wishlist-id="${product.name}" aria-pressed="${wishActive}" onclick="Store.toggleWishlist('${product.name}')">
-          <i class="fas fa-heart"></i>
+          <i class="${heartClass} fa-heart"></i>
         </button>
         <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/200?text=عطر'" style="width:110px;height:110px;object-fit:contain;border-radius:12px;">
         <div style="flex:1;">
@@ -208,7 +214,7 @@
               ? `<button class="btn btn-primary btn-sm" onclick="Store.addToCart({id:'${product.name}',name:'${product.name}',price:${Number(product.price)||0},image:'${product.img}'})">${t("buttons.add_to_cart")}</button>`
               : `<button class="btn btn-outline btn-sm" disabled>غير متوفر</button>`
             }
-            <button class="btn btn-outline btn-sm" onclick="Store.toggleWishlist('${product.name}')"><i class="fas fa-heart"></i> إدارة المفضلة</button>
+            <button class="btn btn-outline btn-sm" data-wishlist-id="${product.name}" aria-pressed="${wishActive}" onclick="Store.toggleWishlist('${product.name}')"><i class="${heartClass} fa-heart"></i> إدارة المفضلة</button>
           </div>
         </div>
       </div>
