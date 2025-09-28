@@ -21,11 +21,11 @@
         </a>
         <div class="header__actions">
           <a href="wishlist.html" class="icon-btn icon-btn--pill" title="المفضلة">
-            <i class="fas fa-heart"></i>
+            <img src="image/icon-heart.svg" alt="المفضلة" class="icon-btn__image" loading="lazy">
             <span class="icon-btn__label">المفضلة</span>
           </a>
           <a href="cart.html" class="icon-btn icon-btn--pill" title="السلة">
-            <i class="fas fa-shopping-cart"></i>
+            <img src="image/icon-cart.svg" alt="السلة" class="icon-btn__image" loading="lazy">
             <span class="icon-btn__label">السلة</span>
             <span class="icon-btn__badge cart-count hidden"></span>
           </a>
@@ -61,7 +61,7 @@
           product.badge==="جديد" ? "badge--new" : "badge--special"
         }">${product.badge}</span>` : "";
 
-    const wishActive = Store.loadWishlist().includes(product.name) ? "active" : "";
+    const wishActive = Store.loadWishlist().includes(product.name);
 
     const availability = product.available
       ? `<span class="availability availability--yes">${t("availability.yes")}</span>`
@@ -72,13 +72,13 @@
       : `<button class="btn btn-outline btn-sm w-100" disabled>غير متوفر</button>`;
 
     const price = product.originalPrice
-      ? `<span class="price--old">${formatNumber(product.originalPrice)} ${t("currency")}</span> <span class="price">${formatNumber(product.price)} ${t("currency")}</span>`
-      : `<span class="price">${formatNumber(product.price)} ${t("currency")}</span>`;
+      ? `<span class="price--old">${formatCurrency(product.originalPrice)}</span> <span class="price">${formatCurrency(product.price)}</span>`
+      : `<span class="price">${formatCurrency(product.price)}</span>`;
 
     return `
       <div class="product-card fade-in" data-id="${product.name}">
         ${badgeHTML}
-        <button class="product-card__wish ${wishActive}" onclick="Store.toggleWishlist('${product.name}')">
+        <button class="product-card__wish ${wishActive ? "active" : ""}" data-wishlist-id="${product.name}" aria-pressed="${wishActive}" onclick="Store.toggleWishlist('${product.name}')">
           <i class="fas fa-heart"></i>
         </button>
         <img class="product-card__image" src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/250?text=عطر'">

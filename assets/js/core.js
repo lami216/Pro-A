@@ -49,11 +49,11 @@
     },
     toasts: {
       added_cart: "تمت إضافة {{name}} إلى السلة",
-      added_wishlist: "أُضيف للمفضلة",
-      removed_wishlist: "أُزيل من المفضلة",
-      removed_cart: "أُزيل من السلة",
+      added_wishlist: "تمت إضافة المنتج إلى المفضلة",
+      removed_wishlist: "تمت إزالة المنتج من المفضلة",
+      removed_cart: "تمت إزالة المنتج من السلة",
       checkout_success: "تم إرسال الطلب عبر واتساب",
-      checkout_failed: "فشل إرسال الطلب"
+      checkout_failed: "تعذر إرسال الطلب"
     }
   };
 
@@ -72,6 +72,13 @@
   // ------------------- Number Format -------------------
   function formatNumber(num){
     return Number(num).toLocaleString("fr-FR");
+  }
+
+  function formatCurrency(num){
+    const value = formatNumber(num);
+    const currency = i18nData.currency || "MRU";
+    if(!value) return currency;
+    return `${currency} ${value}`;
   }
 
   // ------------------- SEO Helpers -------------------
@@ -117,6 +124,7 @@
   window.applyTheme = applyTheme;
   window.t = t;
   window.formatNumber = formatNumber;
+  window.formatCurrency = formatCurrency;
   window.applySEO = applySEO;
 
   // ------------------- Init -------------------

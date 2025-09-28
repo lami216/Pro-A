@@ -66,7 +66,7 @@
       return str.replace(/\{\{(\w+)\}\}/g, (_,k)=> (data[k]!==undefined?data[k]:""));
     }
     function buildItemsList(cart){
-      return cart.map(i => `- ${i.name} ×${i.qty} — ${formatNumber(i.price)} ${t('currency')}`).join('\n');
+      return cart.map(i => `- ${i.name} ×${i.qty} — ${formatCurrency(i.price)}`).join('\n');
     }
     function totalOf(cart){
       return cart.reduce((s,i)=> s + (Number(i.price)||0)* (Number(i.qty)||1), 0);
@@ -93,7 +93,7 @@
           <img src="${item.image}" alt="${item.name}">
           <div class="cart-item__meta">
             <p>${item.name}</p>
-            <p class="muted">${formatNumber(item.price)} ${t('currency')} × ${item.qty}</p>
+            <p class="muted">${formatCurrency(item.price)} × ${item.qty}</p>
           </div>
         </div>
       `).join('');
@@ -107,7 +107,7 @@
       html += `
         <div class="summary">
           <span>الإجمالي</span>
-          <span>${formatNumber(totalOf(cart))} ${t('currency')}</span>
+          <span>${formatCurrency(totalOf(cart))}</span>
         </div>`;
       summary.innerHTML = html;
 
@@ -133,11 +133,11 @@
         }
 
         const itemsStr = buildItemsList(cart);
-        const totalStr = formatNumber(totalOf(cart));
+        const totalStr = formatCurrency(totalOf(cart));
         const fullAddress = locationLabel ? `${locationLabel} — ${address}` : address;
         const template = (window.config && config.whatsapp && config.whatsapp.template)
           ? config.whatsapp.template
-          : "السلام عليكم، أريد:\n{{items}}\nالإجمالي: {{total}} MRU\nالاسم: {{name}}\nالهاتف: {{phone}}\nالعنوان: {{address}}";
+          : "السلام عليكم، أريد:\n{{items}}\nالإجمالي: {{total}}\nالاسم: {{name}}\nالهاتف: {{phone}}\nالعنوان: {{address}}";
 
         const message = tpl(template, {
           items: itemsStr,
