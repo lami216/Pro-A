@@ -20,11 +20,13 @@
           <span class="brand__text logo__text"></span>
         </a>
         <div class="header__actions">
-          <a href="wishlist.html" class="icon-btn" title="المفضلة">
+          <a href="wishlist.html" class="icon-btn icon-btn--pill" title="المفضلة">
             <i class="fas fa-heart"></i>
+            <span class="icon-btn__label">المفضلة</span>
           </a>
-          <a href="cart.html" class="icon-btn" title="السلة">
+          <a href="cart.html" class="icon-btn icon-btn--pill" title="السلة">
             <i class="fas fa-shopping-cart"></i>
+            <span class="icon-btn__label">السلة</span>
             <span class="icon-btn__badge cart-count hidden"></span>
           </a>
         </div>

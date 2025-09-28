@@ -44,9 +44,13 @@
     if(!toolbar) return;
 
     toolbar.innerHTML = `
-      <div class="controls w-100">
-        <input id="q" class="input" type="text" placeholder="ابحث عن عطر…">
-        <button id="searchBtn" class="btn btn-primary">${t("buttons.order_now")}</button>
+      <div class="toolbar__top w-100">
+        <div class="search-bar">
+          <span class="search-bar__icon"><i class="fas fa-search"></i></span>
+          <input id="q" class="input" type="text" placeholder="ابحث عن عطر…">
+          <button id="searchBtn" class="btn btn-primary btn-sm">ابحث</button>
+        </div>
+        <a href="checkout.html" class="btn btn-success toolbar__cta">${t("buttons.order_now")}</a>
       </div>
 
       <div class="toolbar w-100">
