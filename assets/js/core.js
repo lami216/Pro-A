@@ -19,7 +19,13 @@
   function loadConfig(){
     return fetch("config/store.json")
       .then(r => r.json())
-      .then(data => { cfg = {...cfg, ...data}; applyBranding(); applyTheme(); return cfg; })
+      .then(data => {
+        cfg = { ...cfg, ...data };
+        window.config = cfg;
+        applyBranding();
+        applyTheme();
+        return cfg;
+      })
       .catch(() => cfg);
   }
 
