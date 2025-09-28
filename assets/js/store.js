@@ -85,12 +85,17 @@
   }
 
   function updateWishlistUI(){
-    document.querySelectorAll(".product-card[data-id]").forEach(card=>{
-      const id = card.dataset.id;
-      const btn = card.querySelector(".product-card__wish");
-      if(!btn) return;
-      if(wishlist.includes(id)) btn.classList.add("active");
-      else btn.classList.remove("active");
+    const ids = new Set(wishlist);
+    document.querySelectorAll('[data-wishlist-id]').forEach(btn => {
+      const id = btn.dataset.wishlistId;
+      if(!id) return;
+      if(ids.has(id)){
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed','true');
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed','false');
+      }
     });
   }
 
@@ -111,6 +116,27 @@
 
   function getCartLocationLabel(){
     return LOCATION_OPTIONS.find(opt => opt.value === cartLocation)?.label || "";
+  }
+
+  function useCurrentLocation(){
+    if(typeof navigator === "undefined" || !navigator.geolocation){
+      showToast("خدمة تحديد الموقع غير متاحة على هذا الجهاز", { type: "danger" });
+      return;
+    }
+
+    showToast("جارٍ تحديد موقعك…", { type: "info" });
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords || {};
+      if(latitude == null || longitude == null){
+        showToast("تعذر قراءة الإحداثيات", { type: "danger" });
+        return;
+      }
+      const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      window.open(url, "_blank");
+      showToast("تم فتح موقعك على خرائط Google", { type: "success" });
+    }, () => {
+      showToast("يرجى السماح بالوصول إلى موقعك للمتابعة", { type: "danger" });
+    }, { enableHighAccuracy: true, timeout: 10000 });
   }
 
   // ------------------- Toast -------------------
@@ -154,7 +180,7 @@
         <img src="${item.image}" alt="${item.name}">
         <div class="cart-item__meta">
           <p>${item.name}</p>
-          <p class="muted">${formatNumber(item.price)} ${t("currency")} × ${item.qty}</p>
+          <p class="muted">${formatCurrency(item.price)} × ${item.qty}</p>
         </div>
         <button class="cart-item__remove" onclick="Store.removeFromCart('${item.id}')">
           <i class="fas fa-trash-alt"></i>
@@ -171,13 +197,19 @@
     container.innerHTML = `${itemsHTML}
       <div class="cart-location">
         <label for="cartLocation" class="muted">موقع التوصيل</label>
-        <select id="cartLocation" class="select" onchange="Store.setCartLocation(this.value)">
-          ${locationOptions}
-        </select>
+        <div class="cart-location__controls">
+          <select id="cartLocation" class="select" onchange="Store.setCartLocation(this.value)">
+            ${locationOptions}
+          </select>
+          <button type="button" class="btn btn-outline btn-sm cart-location__btn" onclick="Store.useCurrentLocation()">
+            <i class="fas fa-location-crosshairs"></i>
+            استخدام موقعي عبر خرائط Google
+          </button>
+        </div>
       </div>
       <div class="summary">
         <span>الإجمالي</span>
-        <span>${formatNumber(total)} ${t("currency")}</span>
+        <span>${formatCurrency(total)}</span>
       </div>
       <div class="cart-actions">
         <a href="catalog.html" class="btn btn-outline w-100">متابعة التسوق</a>
@@ -190,6 +222,7 @@
     loadCart, saveCart, addToCart, removeFromCart, renderCart,
     loadWishlist, saveWishlist, toggleWishlist, updateWishlistUI,
     updateCartCount, setCartLocation, getCartLocation, getCartLocationLabel,
+    useCurrentLocation,
     showToast
   };
 

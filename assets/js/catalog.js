@@ -22,10 +22,11 @@
   // نطاقات الأسعار الافتراضية (MRU)
   const PRICE_RANGES = [
     { key: "all", label: "جميع الأسعار", test: () => true },
-    { key: "0-20000", label: "أقل من 20000", test: p => p > 0 && p < 20000 },
-    { key: "20000-50000", label: "20000 - 50000", test: p => p >= 20000 && p <= 50000 },
-    { key: "50000-100000", label: "50000 - 100000", test: p => p > 50000 && p <= 100000 },
-    { key: "100000+", label: "أكثر من 100000", test: p => p > 100000 }
+    { key: "1000-3000", label: "MRU 1000 - MRU 3000", test: p => p >= 1000 && p <= 3000 },
+    { key: "3000-5000", label: "MRU 3001 - MRU 5000", test: p => p >= 3001 && p <= 5000 },
+    { key: "5000-7000", label: "MRU 5001 - MRU 7000", test: p => p >= 5001 && p <= 7000 },
+    { key: "7000-9000", label: "MRU 7001 - MRU 9000", test: p => p >= 7001 && p <= 9000 },
+    { key: "9000+", label: "MRU 9001 وأكثر", test: p => p > 9000 }
   ];
 
   // قراءة باراميترات الصفحة لتحديد سياق العرض
@@ -176,15 +177,20 @@
   // توليد بطاقة نمط قائمة (إذا وضعنا العرض كقائمة)
   function createListItem(product){
     const price = product.originalPrice && product.price > 0
-      ? `<span class="price--old">${formatNumber(product.originalPrice)} ${t("currency")}</span> <span class="price">${formatNumber(product.price)} ${t("currency")}</span>`
-      : (product.price > 0 ? `<span class="price">${formatNumber(product.price)} ${t("currency")}</span>` : `<span class="chip">السعر عند الطلب</span>`);
+      ? `<span class="price--old">${formatCurrency(product.originalPrice)}</span> <span class="price">${formatCurrency(product.price)}</span>`
+      : (product.price > 0 ? `<span class="price">${formatCurrency(product.price)}</span>` : `<span class="chip">السعر عند الطلب</span>`);
+
+    const wishActive = Store.loadWishlist().includes(product.name);
 
     const availability = product.available
       ? `<span class="availability availability--yes">${t("availability.yes")}</span>`
       : `<span class="availability availability--no">${t("availability.no")}</span>`;
 
     return `
-      <div class="surface fade-in" style="display:flex; gap:.8rem; padding:.8rem;">
+      <div class="surface fade-in list-item" data-id="${product.name}" style="display:flex; gap:.8rem; padding:.8rem; position:relative;">
+        <button class="list-item__wish ${wishActive ? "active" : ""}" data-wishlist-id="${product.name}" aria-pressed="${wishActive}" onclick="Store.toggleWishlist('${product.name}')">
+          <i class="fas fa-heart"></i>
+        </button>
         <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/200?text=عطر'" style="width:110px;height:110px;object-fit:contain;border-radius:12px;">
         <div style="flex:1;">
           <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
@@ -202,7 +208,7 @@
               ? `<button class="btn btn-primary btn-sm" onclick="Store.addToCart({id:'${product.name}',name:'${product.name}',price:${Number(product.price)||0},image:'${product.img}'})">${t("buttons.add_to_cart")}</button>`
               : `<button class="btn btn-outline btn-sm" disabled>غير متوفر</button>`
             }
-            <button class="btn btn-outline btn-sm" onclick="Store.toggleWishlist('${product.name}')">إضافة للمفضلة</button>
+            <button class="btn btn-outline btn-sm" onclick="Store.toggleWishlist('${product.name}')"><i class="fas fa-heart"></i> إدارة المفضلة</button>
           </div>
         </div>
       </div>

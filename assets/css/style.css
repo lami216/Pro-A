@@ -149,6 +149,12 @@ body{
 .icon-btn__label{
   font-weight:700; font-size:.95rem;
 }
+.icon-btn__image{
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.25));
+}
 .icon-btn__badge{
   position:absolute; inset-inline-end: -6px; inset-block-start: -6px;
   background:#ef4444; color:#fff; min-width:20px; height:20px;
@@ -256,16 +262,17 @@ body{
 .product-card__wish{
   position:absolute; inset-inline-start:.75rem; inset-block-start:.75rem;
   z-index:3; display:inline-flex; align-items:center; justify-content:center;
-  padding:.25rem;
-  background: transparent;
+  width: 38px; height: 38px;
+  background: rgba(15,23,42,.06);
   color: rgba(15,23,42,.55);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   border:0;
   cursor:pointer;
-  transition: transform .15s ease, color .15s ease;
+  border-radius: 999px;
+  transition: transform .15s ease, color .15s ease, background .15s ease;
 }
-.product-card__wish:hover{ transform: scale(1.05); color:#e11d48; }
-.product-card__wish.active{ color:#e11d48; }
+.product-card__wish:hover{ transform: scale(1.05); color:#e11d48; background: rgba(225,29,72,.15); }
+.product-card__wish.active{ color:#e11d48; background: rgba(225,29,72,.18); box-shadow: 0 6px 14px rgba(225,29,72,.2); }
 
 .product-card__image{
   width:100%; height: 220px; border-radius: 16px;
@@ -297,6 +304,26 @@ body{
   margin-top:auto;
   display:flex; align-items:center; gap:.6rem;
 }
+
+.list-item{ position:relative; overflow:hidden; }
+
+.list-item__wish{
+  position:absolute;
+  inset-inline-start:.6rem;
+  inset-block-start:.6rem;
+  width: 34px;
+  height: 34px;
+  border-radius:999px;
+  border:0;
+  background: rgba(15,23,42,.08);
+  color: rgba(15,23,42,.5);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.list-item__wish:hover{ transform: scale(1.05); color:#e11d48; background: rgba(225,29,72,.12); }
+.list-item__wish.active{ color:#e11d48; background: rgba(225,29,72,.18); box-shadow: 0 6px 14px rgba(225,29,72,.18); }
 
 /* ---------------------- Search / Filters ---------------------- */
 .toolbar__top{
@@ -372,20 +399,22 @@ body{
 /* ---------------------- Toast ---------------------- */
 #toast{
   position: fixed; inset-inline: 50%; transform: translateX(-50%);
-  inset-block-end: 1.5rem; background: var(--surface); color:var(--text);
-  padding:.9rem 1.15rem; border-radius: 1rem; z-index: 9999;
-  display:flex; align-items:center; gap:.75rem; box-shadow: var(--shadow-md);
+  inset-block-start: 1.5rem; background: rgba(15,23,42,.92); color:#fff;
+  padding:1rem 1.25rem; border-radius: 1.1rem; z-index: 9999;
+  display:flex; align-items:center; gap:.75rem; box-shadow: var(--shadow-lg);
   border-inline-start: 4px solid var(--positive);
-  min-width: 240px;
-  animation: toastIn .22s ease-out;
+  min-width: 260px;
+  animation: toastIn .25s ease-out;
+  backdrop-filter: blur(8px);
 }
-#toast.fade-out{ animation: toastOut .22s forwards; }
+#toast span{ font-weight:600; letter-spacing:.2px; }
+#toast.fade-out{ animation: toastOut .25s forwards; }
 #toast[data-type="info"]{ border-inline-start-color: var(--primary); }
 #toast[data-type="danger"]{ border-inline-start-color: var(--danger); }
-#toast a{ color: var(--primary-700); font-weight:700; text-decoration:none; }
+#toast a{ color:#facc15; font-weight:700; text-decoration:none; }
 #toast a:hover{ text-decoration:underline; }
-@keyframes toastIn{ from{ opacity:0; transform: translateX(-50%) translateY(8px);} to{ opacity:1; transform: translateX(-50%) translateY(0);} }
-@keyframes toastOut{ to{ opacity:0; transform: translateX(-50%) translateY(8px);} }
+@keyframes toastIn{ from{ opacity:0; transform: translate(-50%, -8px);} to{ opacity:1; transform: translate(-50%, 0);} }
+@keyframes toastOut{ to{ opacity:0; transform: translate(-50%, -8px);} }
 
 /* ---------------------- Modal (generic) ---------------------- */
 .modal{
@@ -433,6 +462,23 @@ body{
   border-radius: .9rem;
   box-shadow: var(--shadow-xs);
 }
+.cart-location__controls{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:.5rem;
+}
+.cart-location__controls select{
+  flex:1 1 220px;
+  min-width: 180px;
+}
+.cart-location__btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  white-space:nowrap;
+}
+.cart-location__btn i{ font-size:.95rem; }
 .cart-actions{
   margin-top: 1rem;
   display:flex; gap:.6rem; flex-wrap:wrap;
