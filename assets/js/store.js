@@ -10,18 +10,8 @@
 (function(){
   const CART_KEY = "perfume_cart";
   const WISHLIST_KEY = "perfume_wishlist";
-  const LOCATION_KEY = "perfume_cart_location";
-  const LOCATION_OPTIONS = [
-    { value: "", label: "اختر موقع التوصيل" },
-    { value: "nkc", label: "نواكشوط" },
-    { value: "nkt", label: "نواذيبو" },
-    { value: "atar", label: "أطار" },
-    { value: "rosso", label: "روصو" }
-  ];
-
   let cart = [];
   let wishlist = [];
-  let cartLocation = "";
 
   // ------------------- Storage Helpers -------------------
   function loadCart(){
@@ -37,13 +27,6 @@
     return wishlist;
   }
   function saveWishlist(){ localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist)); }
-
-  function loadCartLocation(){
-    try { cartLocation = localStorage.getItem(LOCATION_KEY) || ""; }
-    catch(e){ cartLocation = ""; }
-    return cartLocation;
-  }
-  function saveCartLocation(){ localStorage.setItem(LOCATION_KEY, cartLocation); }
 
   // ------------------- Cart Logic -------------------
   function addToCart(product){
@@ -89,54 +72,25 @@
     document.querySelectorAll('[data-wishlist-id]').forEach(btn => {
       const id = btn.dataset.wishlistId;
       if(!id) return;
+      const isHeartButton = btn.classList.contains('product-card__wish') || btn.classList.contains('list-item__wish');
       if(ids.has(id)){
-        btn.classList.add('active');
+        if(isHeartButton){ btn.classList.add('active'); }
         btn.setAttribute('aria-pressed','true');
+        const icon = btn.querySelector('i');
+        if(icon){
+          icon.classList.remove('far','fa-regular');
+          icon.classList.add('fas','fa-solid');
+        }
       } else {
-        btn.classList.remove('active');
+        if(isHeartButton){ btn.classList.remove('active'); }
         btn.setAttribute('aria-pressed','false');
+        const icon = btn.querySelector('i');
+        if(icon){
+          icon.classList.remove('fas','fa-solid');
+          icon.classList.add('far','fa-regular');
+        }
       }
     });
-  }
-
-  function setCartLocation(value){
-    const newValue = value || "";
-    if(cartLocation === newValue) return;
-    cartLocation = newValue;
-    saveCartLocation();
-    if(cartLocation){
-      const label = LOCATION_OPTIONS.find(opt => opt.value === cartLocation)?.label || "";
-      showToast(`تم تحديث موقع التوصيل إلى ${label}`, { type: "info" });
-    }
-  }
-
-  function getCartLocation(){
-    return cartLocation;
-  }
-
-  function getCartLocationLabel(){
-    return LOCATION_OPTIONS.find(opt => opt.value === cartLocation)?.label || "";
-  }
-
-  function useCurrentLocation(){
-    if(typeof navigator === "undefined" || !navigator.geolocation){
-      showToast("خدمة تحديد الموقع غير متاحة على هذا الجهاز", { type: "danger" });
-      return;
-    }
-
-    showToast("جارٍ تحديد موقعك…", { type: "info" });
-    navigator.geolocation.getCurrentPosition(position => {
-      const { latitude, longitude } = position.coords || {};
-      if(latitude == null || longitude == null){
-        showToast("تعذر قراءة الإحداثيات", { type: "danger" });
-        return;
-      }
-      const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
-      window.open(url, "_blank");
-      showToast("تم فتح موقعك على خرائط Google", { type: "success" });
-    }, () => {
-      showToast("يرجى السماح بالوصول إلى موقعك للمتابعة", { type: "danger" });
-    }, { enableHighAccuracy: true, timeout: 10000 });
   }
 
   // ------------------- Toast -------------------
@@ -164,7 +118,6 @@
     const container = document.getElementById("cartItems");
     if(!container) return;
     loadCart();
-    loadCartLocation();
     if(cart.length===0){
       container.innerHTML = `<div class="text-center muted">
         <p>سلتك فارغة</p>
@@ -189,24 +142,7 @@
       </div>`;
     }).join("");
 
-    const locationOptions = LOCATION_OPTIONS.map(opt => {
-      const selected = opt.value === cartLocation ? "selected" : "";
-      return `<option value="${opt.value}" ${selected}>${opt.label}</option>`;
-    }).join("");
-
     container.innerHTML = `${itemsHTML}
-      <div class="cart-location">
-        <label for="cartLocation" class="muted">موقع التوصيل</label>
-        <div class="cart-location__controls">
-          <select id="cartLocation" class="select" onchange="Store.setCartLocation(this.value)">
-            ${locationOptions}
-          </select>
-          <button type="button" class="btn btn-outline btn-sm cart-location__btn" onclick="Store.useCurrentLocation()">
-            <i class="fas fa-location-crosshairs"></i>
-            استخدام موقعي عبر خرائط Google
-          </button>
-        </div>
-      </div>
       <div class="summary">
         <span>الإجمالي</span>
         <span>${formatCurrency(total)}</span>
@@ -221,14 +157,13 @@
   window.Store = {
     loadCart, saveCart, addToCart, removeFromCart, renderCart,
     loadWishlist, saveWishlist, toggleWishlist, updateWishlistUI,
-    updateCartCount, setCartLocation, getCartLocation, getCartLocationLabel,
-    useCurrentLocation,
+    updateCartCount,
     showToast
   };
 
   // ------------------- Init -------------------
   document.addEventListener("DOMContentLoaded", ()=>{
-    loadCart(); loadWishlist(); loadCartLocation();
+    loadCart(); loadWishlist();
     updateCartCount(); updateWishlistUI();
   });
 
