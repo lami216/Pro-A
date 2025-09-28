@@ -200,7 +200,7 @@
           return;
         }
 
-        const url = `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
+        const url = `https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(message)}`;
         try{
           window.open(url, '_blank');
           // clear cart
