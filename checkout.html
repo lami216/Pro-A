@@ -191,8 +191,14 @@
         });
 
         const num = (window.config && config.whatsapp && config.whatsapp.number)
-          ? String(config.whatsapp.number).replace(/\s+/g,'')
+          ? String(config.whatsapp.number).replace(/\D+/g,'')
           : "";
+
+        if(!num){
+          alert("رقم الواتساب غير متوفر حالياً، يرجى المحاولة لاحقاً.");
+          resetLocationBtn();
+          return;
+        }
 
         const url = `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
         try{
