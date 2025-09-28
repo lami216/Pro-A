@@ -4,10 +4,27 @@
   <meta charset="UTF-8">
   <title>تواصل معنا</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="نحن هنا للإجابة على جميع استفساراتك — تواصل معنا عبر النموذج أو مباشرة عبر واتساب.">
+  <meta name="description" content="نحن هنا للإجابة على جميع استفساراتك — تواصل معنا عبر واتساب أو الهاتف أو الشبكات الاجتماعية.">
   <link rel="icon" type="image/png" href="image/favicon-32x32.png">
   <link rel="stylesheet" href="assets/css/style.css">
   <script src="https://kit.fontawesome.com/a2d9d5a64b.js" crossorigin="anonymous"></script>
+  <style>
+    .social-grid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.8rem; }
+    @media (max-width:520px){ .social-grid{ grid-template-columns:1fr; } }
+    .social-card{
+      display:flex; align-items:center; gap:.8rem; padding:.9rem; border-radius:14px;
+      background: var(--surface); box-shadow: var(--shadow-sm); text-decoration:none; color:inherit;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .social-card:hover{ transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .logo-circle{
+      width:48px; height:48px; border-radius:999px; display:grid; place-items:center; color:#fff;
+    }
+    .logo-wa{ background:#25D366; }   /* WhatsApp */
+    .logo-fb{ background:#1877F2; }   /* Facebook */
+    .logo-tt{ background:#000000; }   /* TikTok */
+    .contact-links a.link{ display:inline-flex; align-items:center; gap:.4rem; }
+  </style>
 </head>
 <body>
   <!-- Header -->
@@ -17,42 +34,73 @@
   <section class="banner">
     <div class="container">
       <h1 class="banner__title">تواصل معنا</h1>
-      <p class="banner__sub">فريقنا جاهز دائماً لمساعدتك</p>
+      <p class="banner__sub">اختر الطريقة الأنسب لك — واتساب، اتصال مباشر، أو عبر شبكاتنا</p>
     </div>
   </section>
 
   <!-- Contact Section -->
   <section class="section">
     <div class="container grid grid-2">
-      <!-- Contact Form -->
+      <!-- Left: Direct contacts -->
       <div class="surface p-3">
-        <h2 class="section-title">راسلنا</h2>
+        <h2 class="section-title">معلومات التواصل</h2>
+        <div class="contact-links" style="display:flex; flex-direction:column; gap:.6rem;">
+          <div>
+            <i class="fas fa-phone"></i>
+            <strong>الهاتف:</strong>
+            <a href="tel:+22242723477" class="link">+222 427 23 477</a>
+          </div>
+          <div>
+            <i class="fab fa-whatsapp"></i>
+            <strong>واتساب:</strong>
+            <a href="https://wa.me/22242723477" target="_blank" rel="noopener" class="link">محادثة مباشرة</a>
+          </div>
+        </div>
+
+        <h3 class="mt-3">روابطنا</h3>
+        <div class="social-grid mt-2">
+          <!-- WhatsApp button -->
+          <a class="social-card" href="https://wa.me/22242723477" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <div class="logo-circle logo-wa"><i class="fab fa-whatsapp"></i></div>
+            <div>
+              <strong>WhatsApp</strong>
+              <div class="muted">راسلنا فورًا عبر الواتساب</div>
+            </div>
+          </a>
+
+          <!-- Facebook button -->
+          <a class="social-card" href="https://www.facebook.com/perfumekingdom.store" target="_blank" rel="noopener" aria-label="Facebook">
+            <div class="logo-circle logo-fb"><i class="fab fa-facebook-f"></i></div>
+            <div>
+              <strong>Facebook</strong>
+              <div class="muted">تابع آخر العروض والتحديثات</div>
+            </div>
+          </a>
+
+          <!-- TikTok button -->
+          <a class="social-card" href="https://www.tiktok.com/@al_sahib_dd?_t=ZM-906bIDk6OJ1&_r=1" target="_blank" rel="noopener" aria-label="TikTok">
+            <div class="logo-circle logo-tt"><i class="fab fa-tiktok"></i></div>
+            <div>
+              <strong>TikTok</strong>
+              <div class="muted">مقاطع ومنتجات مختارة</div>
+            </div>
+          </a>
+
+          <!-- (اختياري) Instagram/Twitter لاحقًا إن رغبت -->
+        </div>
+      </div>
+
+      <!-- Right: Simple form (optional) -->
+      <div class="surface p-3">
+        <h2 class="section-title">راسلنا عبر النموذج</h2>
         <form id="contactForm" class="grid" style="grid-template-columns:1fr 1fr; gap:.8rem;">
           <input type="text" id="name" class="input" placeholder="الاسم الكامل" required>
           <input type="email" id="email" class="input" placeholder="البريد الإلكتروني" required>
           <input type="text" id="subject" class="input" placeholder="الموضوع" style="grid-column:1/-1;" required>
-          <textarea id="message" class="input" placeholder="رسالتك..." rows="5" style="grid-column:1/-1;" required></textarea>
+          <textarea id="message" class="input" placeholder="رسالتك..." rows="6" style="grid-column:1/-1;" required></textarea>
           <button type="submit" class="btn btn-primary" style="grid-column:1/-1;">إرسال</button>
         </form>
         <p id="formMsg" class="muted mt-2"></p>
-      </div>
-
-      <!-- Contact Info -->
-      <div class="surface p-3">
-        <h2 class="section-title">معلومات التواصل</h2>
-        <p class="muted mb-2">يمكنك التواصل معنا عبر القنوات التالية:</p>
-        <ul style="list-style:none; padding:0; margin:0;">
-          <li class="mb-2"><i class="fas fa-phone"></i> <strong>الهاتف:</strong> <a href="tel:+22200000000" class="link">+222 00 00 00 00</a></li>
-          <li class="mb-2"><i class="fab fa-whatsapp"></i> <strong>واتساب:</strong> <a href="https://wa.me/22200000000" target="_blank" class="link">محادثة مباشرة</a></li>
-          <li class="mb-2"><i class="fas fa-envelope"></i> <strong>الإيميل:</strong> <a href="mailto:info@perfume-store.com" class="link">info@perfume-store.com</a></li>
-        </ul>
-
-        <h3 class="mt-3">تابعنا</h3>
-        <div style="display:flex; gap:.8rem; margin-top:.5rem;">
-          <a href="#" class="icon-btn" style="background:#3b5998;"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="icon-btn" style="background:#1da1f2;"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="icon-btn" style="background:#e1306c;"><i class="fab fa-instagram"></i></a>
-        </div>
       </div>
     </div>
   </section>
@@ -66,13 +114,17 @@
   <script src="assets/js/ui.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", ()=>{
-      applySEO({ title:"تواصل معنا", description:"نحن هنا للإجابة على جميع استفساراتك — تواصل معنا عبر النموذج أو مباشرة عبر واتساب." });
+      applySEO({
+        title:"تواصل معنا",
+        description:"تواصل معنا عبر واتساب أو الهاتف أو شبكاتنا الاجتماعية — نخدمك بسرعة وبود."
+      });
 
+      // رسالة نجاح فورية للنموذج (بدون إرسال فعلي)
       const form = document.getElementById("contactForm");
-      const msg = document.getElementById("formMsg");
+      const msg  = document.getElementById("formMsg");
       form.addEventListener("submit", e=>{
         e.preventDefault();
-        msg.textContent = "✅ تم إرسال رسالتك بنجاح. سنتواصل معك قريباً.";
+        msg.textContent = "✅ تم إرسال رسالتك بنجاح. سنتواصل معك قريبًا.";
         form.reset();
       });
     });
