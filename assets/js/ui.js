@@ -62,7 +62,7 @@
         }">${product.badge}</span>` : "";
 
     const wishActive = Store.loadWishlist().includes(product.name);
-    const heartClass = wishActive ? "fas fa-solid" : "far fa-regular";
+    const heartClass = wishActive ? "fa-solid fas" : "fa-regular far";
 
     const availability = product.available
       ? `<span class="availability availability--yes">${t("availability.yes")}</span>`
