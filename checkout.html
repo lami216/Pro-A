@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إتمام الطلب</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="أدخل بياناتك وأرسل طلبك مباشرة عبر واتساب.">
+  <link rel="icon" type="image/png" href="image/favicon-32x32.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://kit.fontawesome.com/a2d9d5a64b.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header"></header>
+
+  <!-- Banner -->
+  <section class="banner">
+    <div class="container">
+      <h1 class="banner__title">إتمام الطلب</h1>
+      <p class="banner__sub">تحقّق من المنتجات ثم املأ بياناتك لإرسال الطلب على واتساب</p>
+    </div>
+  </section>
+
+  <!-- Checkout -->
+  <section class="section">
+    <div class="container" style="max-width:720px;">
+      <!-- Summary -->
+      <div id="summary" class="surface p-3 mb-3"></div>
+
+      <!-- Form -->
+      <div class="surface p-3">
+        <div class="grid" style="grid-template-columns:1fr 1fr;">
+          <div>
+            <label class="muted">الاسم الكامل</label>
+            <input id="coName" class="input" placeholder="اكتب اسمك الكامل">
+          </div>
+          <div>
+            <label class="muted">رقم الهاتف</label>
+            <input id="coPhone" class="input" placeholder="مثال: 22222222">
+          </div>
+          <div style="grid-column:1/-1;">
+            <label class="muted">العنوان</label>
+            <input id="coAddress" class="input" placeholder="المدينة / الحي / تفاصيل التوصيل">
+          </div>
+        </div>
+
+        <div class="mt-3" style="display:flex; gap:.6rem; flex-wrap:wrap;">
+          <button id="sendOrder" class="btn btn-success">تأكيد وإرسال عبر واتساب</button>
+          <a href="cart.html" class="btn btn-outline">العودة للسلة</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer text-center"></footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script>
+    // --- Helpers ---
+    function tpl(str, data){
+      return str.replace(/\{\{(\w+)\}\}/g, (_,k)=> (data[k]!==undefined?data[k]:""));
+    }
+    function buildItemsList(cart){
+      return cart.map(i => `- ${i.name} ×${i.qty} — ${formatNumber(i.price)} ${t('currency')}`).join('\n');
+    }
+    function totalOf(cart){
+      return cart.reduce((s,i)=> s + (Number(i.price)||0)* (Number(i.qty)||1), 0);
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+      // SEO
+      applySEO({ title: "إتمام الطلب", description: "أدخل بياناتك وأرسل طلبك مباشرة عبر واتساب." });
+
+      // Summary
+      const cart = Store.loadCart();
+      const summary = document.getElementById("summary");
+      if(cart.length === 0){
+        summary.innerHTML = `
+          <div class="text-center muted">
+            <p>سلتك فارغة</p>
+            <a href="catalog.html" class="btn btn-primary mt-2">تصفح المنتجات</a>
+          </div>`;
+        return;
+      }
+      let html = cart.map(item => `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.name}">
+          <div class="cart-item__meta">
+            <p>${item.name}</p>
+            <p class="muted">${formatNumber(item.price)} ${t('currency')} × ${item.qty}</p>
+          </div>
+        </div>
+      `).join('');
+      html += `
+        <div class="summary">
+          <span>الإجمالي</span>
+          <span>${formatNumber(totalOf(cart))} ${t('currency')}</span>
+        </div>`;
+      summary.innerHTML = html;
+
+      // Form bindings
+      const nameEl = document.getElementById("coName");
+      const phoneEl = document.getElementById("coPhone");
+      const addrEl  = document.getElementById("coAddress");
+      const btn = document.getElementById("sendOrder");
+
+      btn.addEventListener("click", ()=>{
+        const name = (nameEl.value||"").trim();
+        const phone = (phoneEl.value||"").trim();
+        const address = (addrEl.value||"").trim();
+
+        if(!name || !phone){
+          Store && Store.updateCartCount(); // just to ensure header badge ok
+          alert("يرجى إدخال الاسم والهاتف");
+          return;
+        }
+        if(!address){
+          alert("يرجى إدخال العنوان");
+          return;
+        }
+
+        const itemsStr = buildItemsList(cart);
+        const totalStr = formatNumber(totalOf(cart));
+        const template = (window.config && config.whatsapp && config.whatsapp.template)
+          ? config.whatsapp.template
+          : "السلام عليكم، أريد:\n{{items}}\nالإجمالي: {{total}} MRU\nالاسم: {{name}}\nالهاتف: {{phone}}\nالعنوان: {{address}}";
+
+        const message = tpl(template, {
+          items: itemsStr,
+          total: totalStr,
+          name, phone, address
+        });
+
+        const num = (window.config && config.whatsapp && config.whatsapp.number)
+          ? String(config.whatsapp.number).replace(/\s+/g,'')
+          : "";
+
+        const url = `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
+        try{
+          window.open(url, '_blank');
+          // clear cart
+          localStorage.setItem("perfume_cart","[]");
+          Store.updateCartCount();
+          // toast
+          const tdiv = document.createElement('div');
+          tdiv.id = 'toast';
+          tdiv.innerHTML = `<span>${t("toasts.checkout_success")}</span>`;
+          document.body.appendChild(tdiv);
+          setTimeout(()=>{ tdiv.classList.add("fade-out"); setTimeout(()=> tdiv.remove(), 350); }, 1800);
+          // redirect home
+          setTimeout(()=> location.href = "index.html", 600);
+        }catch(e){
+          const tdiv = document.createElement('div');
+          tdiv.id = 'toast';
+          tdiv.style.background = '#ef4444';
+          tdiv.innerHTML = `<span>${t("toasts.checkout_failed")}</span>`;
+          document.body.appendChild(tdiv);
+          setTimeout(()=>{ tdiv.classList.add("fade-out"); setTimeout(()=> tdiv.remove(), 350); }, 1800);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
